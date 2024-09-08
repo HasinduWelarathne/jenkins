@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DIRECTORY_PATH = '' 
+        DIRECTORY_PATH = ''  
         TEST_ENV = 'staging'
         PROD_ENV = 'production'
         EMAIL = 'hasinduwelarathne@gmail.com'
@@ -17,15 +17,17 @@ pipeline {
             steps {
                 echo 'Running unit tests with JUnit'
                 echo 'Running integration tests with Selenium'
+                // Create a dummy log file
+                writeFile file: 'test.log', text: 'Unit tests and integration tests completed successfully.'
             }
             post {
                 always {
-                    archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true 
+                    archiveArtifacts artifacts: 'test.log', allowEmptyArchive: true
                     emailext (
                         to: env.EMAIL,
                         subject: "Unit & Integration Tests Status: ${currentBuild.currentResult}",
-                        body: "The Unit & Integration tests have ${currentBuild.currentResult}.\nCheck logs for details.",
-                        attachmentsPattern: '**/*.log' 
+                        body: "The Unit & Integration tests have ${currentBuild.currentResult}.\nCheck the attached log for details.",
+                        attachmentsPattern: 'test.log'  
                     )
                 }
             }
@@ -33,20 +35,24 @@ pipeline {
         stage('Code Analysis') {
             steps {
                 echo 'Analyzing code with SonarQube'
+                // Create a dummy log for this stage
+                writeFile file: 'code-analysis.log', text: 'Code analysis completed successfully.'
             }
         }
         stage('Security Scan') {
             steps {
                 echo 'Scanning code for security vulnerabilities using OWASP Dependency Check'
+                // Create a dummy log for this stage
+                writeFile file: 'security-scan.log', text: 'Security scan completed successfully.'
             }
             post {
                 always {
-                    archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true  
+                    archiveArtifacts artifacts: 'security-scan.log', allowEmptyArchive: true
                     emailext (
                         to: env.EMAIL,
                         subject: "Security Scan Status: ${currentBuild.currentResult}",
-                        body: "The Security scan has ${currentBuild.currentResult}.\nCheck logs for details.",
-                        attachmentsPattern: '**/*.log' 
+                        body: "The Security scan has ${currentBuild.currentResult}.\nCheck the attached log for details.",
+                        attachmentsPattern: 'security-scan.log'
                     )
                 }
             }
@@ -68,4 +74,5 @@ pipeline {
         }
     }
 }
+
 
