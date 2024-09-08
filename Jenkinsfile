@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DIRECTORY_PATH = ''  
+        DIRECTORY_PATH = '' 
         TEST_ENV = 'staging'
         PROD_ENV = 'production'
         EMAIL = 'hasinduwelarathne@gmail.com'
@@ -20,9 +20,13 @@ pipeline {
             }
             post {
                 always {
-                    mail to: env.EMAIL,
-                         subject: "Unit & Integration Tests Status: ${currentBuild.currentResult}",
-                         body: "The Unit & Integration tests have ${currentBuild.currentResult}.\nCheck logs for details."
+                    archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true 
+                    emailext (
+                        to: env.EMAIL,
+                        subject: "Unit & Integration Tests Status: ${currentBuild.currentResult}",
+                        body: "The Unit & Integration tests have ${currentBuild.currentResult}.\nCheck logs for details.",
+                        attachmentsPattern: '**/*.log' 
+                    )
                 }
             }
         }
@@ -37,9 +41,13 @@ pipeline {
             }
             post {
                 always {
-                    mail to: env.EMAIL,
-                         subject: "Security Scan Status: ${currentBuild.currentResult}",
-                         body: "The Security scan has ${currentBuild.currentResult}.\nCheck logs for details."
+                    archiveArtifacts artifacts: '**/*.log', allowEmptyArchive: true  
+                    emailext (
+                        to: env.EMAIL,
+                        subject: "Security Scan Status: ${currentBuild.currentResult}",
+                        body: "The Security scan has ${currentBuild.currentResult}.\nCheck logs for details.",
+                        attachmentsPattern: '**/*.log' 
+                    )
                 }
             }
         }
@@ -60,3 +68,4 @@ pipeline {
         }
     }
 }
+
